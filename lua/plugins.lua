@@ -41,11 +41,19 @@ packer.init({
 -- Install your plugins here
 return packer.startup(function(use)
 	use ("wbthomason/packer.nvim") -- Have packer manage itself	
-
+        
+	use {
+  'nvim-tree/nvim-tree.lua',
+  requires = {
+    'nvim-tree/nvim-web-devicons', -- optional
+  },
+}
+use 'm4xshen/autoclose.nvim'
 
 
 	if PACKER_BOOTSTRAP then
 		require("packer").sync()
 	end
 end)
+
 
