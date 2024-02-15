@@ -49,7 +49,22 @@ return packer.startup(function(use)
   },
 }
 use 'm4xshen/autoclose.nvim'
-
+use {
+  'nvim-lualine/lualine.nvim',
+  requires = { 'nvim-tree/nvim-web-devicons', opt = true }
+}
+use {
+	'tjdevries/colorbuddy.vim'
+}
+use {
+	'svrana/neosolarized.nvim'
+}
+use { 
+	'neovim/nvim-lspconfig'
+}
+use('jose-elias-alvarez/null-ls.nvim')
+use('MunifTanjim/prettier.nvim')
+use "nvim-lua/plenary.nvim"
 
 	if PACKER_BOOTSTRAP then
 		require("packer").sync()
