@@ -1,28 +1,81 @@
-require('plugins')
-require('lualine-config')
-require('null-ls-config')
-require('prettier-config')
-vim.opt.number = true
-vim.opt.hlsearch = false
-vim.g.mapleader = ' '
-vim.keymap.set('n', '<leader>w', '<cmd>write<cr>')
-vim.keymap.set('n', '<leader>f', '<cmd>Prettier<cr>')
+vim.api.nvim_set_keymap('i', 'jk', '<Esc>', { noremap = true, silent = true })
 
-vim.keymap.set("i", "jj", "<ESC>")
+local ensure_packer = function()
+	local fn = vim.fn
+	local install_path = fn.stdpath('data')..'/site/pack/packer/start/packer.nvim'
+	if fn.empty(fn.glob(install_path)) > 0 then
+		fn.system({'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', install_path})
+		vim.cmd [[packadd packer.nvim]]
+	end
+end
 
--- disable netrw at the very start of your init.lua
-vim.g.loaded_netrw = 1
-vim.g.loaded_netrwPlugin = 1
+ensure_packer()
 
--- optionally enable 24-bit colour
-vim.opt.termguicolors = true
+-- Настройка плагинов
+require('packer').startup(function()
+	use 'wbthomason/packer.nvim' -- Сам Packer
+	use {
+		'nvim-lualine/lualine.nvim', -- Статусная строка
+		requires = { 'nvim-tree/nvim-web-devicons', opt = true } -- Иконки (необязательно)
+	}
+	use 'morhetz/gruvbox'
+	use({
+		"olimorris/codecompanion.nvim",
+		config = function()
+			require("codecompanion").setup()
+		end,
+		requires = {
+			"nvim-lua/plenary.nvim",
+			"nvim-treesitter/nvim-treesitter",
+			-- The following are optional:
+			{ "MeanderingProgrammer/render-markdown.nvim", ft = { "markdown", "codecompanion" } },
+		}
+	})
+	use({
+        "robitx/gp.nvim",
+        config = function()
+        local conf = {
+            -- For customization, refer to Install > Configuration in the Documentation/Readme
+        }
+        require("gp").setup(conf)
 
--- empty setup using defaults
-require("nvim-tree").setup()
-require("autoclose").setup()
-require('lualine').setup()
-require('neosolarized').setup({
-    comment_italics = true,
-    background_set = false,
-  })
-require'lspconfig'.pyright.setup{}
+        -- Setup shortcuts here (see Usage > Shortcuts in the Documentation/Readme)
+    end,
+})
+
+end)
+
+-- Подключение lualine
+require('lualine').setup({
+	options = {
+		theme = 'gruvbox', -- Укажите тему
+	}
+})
+-- CodeCompanion
+require("codecompanion").setup({
+  strategies = {
+    chat = {
+      adapter = "openai",
+    },
+    inline = {
+      adapter = "openai",
+    },
+  },
+  adapters = {
+    openai = function()
+      return require("codecompanion.adapters").extend("openai", {
+        env = {
+          api_key = os.getenv("OPENAI_API_KEY"),
+	  print("Extracted API Key:", api_key),
+        },
+      })
+    end,
+  },
+
+})
+local key = os.getenv("OPENAI_API_KEY")
+if not key then
+  print("API Key not set in environment variables")
+else
+  print("Extracted API Key from environment:", key)
+end
